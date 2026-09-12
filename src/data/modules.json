@@ -1,0 +1,223 @@
+[
+  {
+    "id": "01",
+    "title": "Introduction",
+    "description": "Panoramica del corso Claude API: obiettivi di apprendimento, struttura dei moduli e setup dell'ambiente di sviluppo.",
+    "codeSnippet": "// Verifica setup ambiente\nconsole.log('Claude API Course avviato');\nconst modules = 12;\nconsole.log(`Percorso: ${modules} moduli`);",
+    "completedDate": null,
+    "isCompleted": false,
+    "challenge": {
+      "type": "quiz",
+      "question": "Cosa serve, come minimo, per iniziare a chiamare l'API di Claude dal proprio codice?",
+      "options": [
+        "Una GPU locale con almeno 24 GB di VRAM",
+        "Una API key Anthropic e l'SDK ufficiale (Python o TypeScript)",
+        "Un account GitHub verificato"
+      ],
+      "correctIndex": 1,
+      "hint": "I modelli girano sui server Anthropic: ti serve solo un modo autenticato per parlarci."
+    }
+  },
+  {
+    "id": "02",
+    "title": "Anthropic Overview",
+    "description": "Storia e missione di Anthropic, principi di AI safety e panoramica della famiglia di modelli Claude.",
+    "codeSnippet": "// Modelli disponibili\nconst models = [\n  'claude-opus-5',\n  'claude-sonnet-5',\n  'claude-haiku-4-5-20251001'\n];",
+    "completedDate": null,
+    "isCompleted": false,
+    "challenge": {
+      "type": "quiz",
+      "question": "Quale modello della famiglia Claude è pensato per essere il più veloce ed economico?",
+      "options": ["Claude Opus", "Claude Haiku", "Claude Sonnet"],
+      "correctIndex": 1,
+      "hint": "Il nome richiama la forma di poesia più breve."
+    }
+  },
+  {
+    "id": "03",
+    "title": "Accessing Claude with the API",
+    "description": "Autenticazione, primo messaggio con l'SDK Python/TypeScript e gestione delle risposte dell'API Messages.",
+    "codeSnippet": "from anthropic import Anthropic\n\nclient = Anthropic()\nmsg = client.messages.create(\n    model='claude-sonnet-5',\n    max_tokens=1024,\n    messages=[{'role': 'user', 'content': 'Ciao Claude!'}]\n)\nprint(msg.content)",
+    "completedDate": null,
+    "isCompleted": false,
+    "challenge": {
+      "type": "code",
+      "question": "Questa chiamata all'API Messages fallisce. Perché?",
+      "code": "from anthropic import Anthropic\n\nclient = Anthropic()\nmsg = client.messages.create(\n    model=\"claude-sonnet-5\",\n    messages=[{\"role\": \"user\", \"content\": \"Ciao!\"}]\n)\nprint(msg.content[0].text)",
+      "options": [
+        "Il ruolo del primo messaggio deve essere \"assistant\"",
+        "print deve usare msg.text invece di msg.content[0].text",
+        "Manca il parametro obbligatorio max_tokens"
+      ],
+      "correctIndex": 2,
+      "hint": "messages.create pretende sempre un limite massimo per i token generati."
+    }
+  },
+  {
+    "id": "04",
+    "title": "Prompt Evaluation",
+    "description": "Costruzione di pipeline di valutazione per prompt: grading automatico, validazione della sintassi e metriche di qualità.",
+    "codeSnippet": "def grade_response(response, criteria):\n    score = model_based_grader(\n        response, criteria\n    )\n    return score if is_valid(score) else None",
+    "completedDate": null,
+    "isCompleted": false,
+    "challenge": {
+      "type": "code",
+      "question": "Questo grader a keyword restituisce punteggi assurdi. Dov'è il bug?",
+      "code": "def grade(response, expected_keywords):\n    hits = 0\n    for kw in expected_keywords:\n        if kw in response:\n            hits += 1\n    return hits / len(response)",
+      "options": [
+        "Divide per la lunghezza della risposta invece che per il numero di keyword",
+        "hits dovrebbe partire da 1, non da 0",
+        "Il ciclo for dovrebbe iterare su response"
+      ],
+      "correctIndex": 0,
+      "hint": "Il punteggio dovrebbe essere la frazione di keyword attese effettivamente trovate."
+    }
+  },
+  {
+    "id": "05",
+    "title": "Prompt Engineering Techniques",
+    "description": "Tecniche avanzate di prompting: chain-of-thought, few-shot examples, XML tags e system prompt efficaci.",
+    "codeSnippet": "system_prompt = '''\nSei un assistente esperto.\nRispondi usando <answer></answer>.\n'''",
+    "completedDate": null,
+    "isCompleted": false,
+    "challenge": {
+      "type": "quiz",
+      "question": "Quale tecnica consiste nel mostrare al modello alcuni esempi già risolti prima della richiesta vera?",
+      "options": ["Chain-of-thought", "Temperature scaling", "Few-shot prompting"],
+      "correctIndex": 2,
+      "hint": "In questo contesto \"shot\" significa esempio."
+    }
+  },
+  {
+    "id": "06",
+    "title": "Tool Use with Claude",
+    "description": "Definizione di tool personalizzati, tool_choice e gestione del ciclo agentico di chiamata funzioni.",
+    "codeSnippet": null,
+    "completedDate": null,
+    "isCompleted": false,
+    "challenge": {
+      "type": "code",
+      "question": "Claude risponde a parole ma non chiama mai get_weather. Perché?",
+      "code": "tools = [{\n    \"name\": \"get_weather\",\n    \"description\": \"Restituisce il meteo di una città\",\n    \"input_schema\": {\n        \"type\": \"object\",\n        \"properties\": {\"city\": {\"type\": \"string\"}}\n    }\n}]\n\nresponse = client.messages.create(\n    model=\"claude-sonnet-5\",\n    max_tokens=1024,\n    messages=[{\"role\": \"user\", \"content\": \"Che tempo fa a Roma?\"}]\n)",
+      "options": [
+        "input_schema deve essere una stringa JSON, non un dict",
+        "La lista tools non viene passata a messages.create",
+        "Il nome del tool deve contenere uno spazio"
+      ],
+      "correctIndex": 1,
+      "hint": "Definire un tool non basta: Claude deve riceverlo nella richiesta."
+    }
+  },
+  {
+    "id": "07",
+    "title": "RAG and Agentic Search",
+    "description": "Retrieval-augmented generation, embedding, indicizzazione documenti e ricerca agentica su basi di conoscenza.",
+    "codeSnippet": null,
+    "completedDate": null,
+    "isCompleted": false,
+    "challenge": {
+      "type": "quiz",
+      "question": "In una pipeline RAG, cosa succede PRIMA di inviare la domanda al modello?",
+      "options": [
+        "Si recuperano i documenti più rilevanti da un indice (es. con embedding)",
+        "Si riaddestra il modello sui nuovi documenti",
+        "Si aumenta max_tokens per far entrare tutti i documenti"
+      ],
+      "correctIndex": 0,
+      "hint": "La R di RAG sta per Retrieval."
+    }
+  },
+  {
+    "id": "08",
+    "title": "Features of Claude",
+    "description": "Funzionalità avanzate della piattaforma: prompt caching, vision, extended thinking e citations.",
+    "codeSnippet": null,
+    "completedDate": null,
+    "isCompleted": false,
+    "challenge": {
+      "type": "code",
+      "question": "Questa richiesta con prompt caching viene rifiutata dall'API. Qual è l'errore?",
+      "code": "response = client.messages.create(\n    model=\"claude-sonnet-5\",\n    max_tokens=1024,\n    system=[{\n        \"type\": \"text\",\n        \"text\": LONG_DOCUMENT,\n        \"cache_control\": {\"type\": \"persistent\"}\n    }],\n    messages=[{\"role\": \"user\", \"content\": \"Riassumi il documento\"}]\n)",
+      "options": [
+        "system deve essere una stringa semplice, non una lista",
+        "max_tokens è troppo basso per attivare il caching",
+        "cache_control accetta solo il tipo \"ephemeral\""
+      ],
+      "correctIndex": 2,
+      "hint": "Il caching dei prompt ha un solo tipo valido, e non è permanente."
+    }
+  },
+  {
+    "id": "09",
+    "title": "Model Context Protocol",
+    "description": "Introduzione a MCP: server, risorse e strumenti per connettere Claude a sistemi esterni in modo standardizzato.",
+    "codeSnippet": null,
+    "completedDate": null,
+    "isCompleted": false,
+    "challenge": {
+      "type": "quiz",
+      "question": "Nel Model Context Protocol, chi espone tools e risorse al modello?",
+      "options": ["Un server MCP", "Il tokenizer del modello", "Il browser dell'utente"],
+      "correctIndex": 0,
+      "hint": "MCP ha un'architettura client-server."
+    }
+  },
+  {
+    "id": "10",
+    "title": "Claude Code and Computer Use",
+    "description": "Automazione da riga di comando con Claude Code e controllo del computer per interagire con interfacce grafiche.",
+    "codeSnippet": null,
+    "completedDate": null,
+    "isCompleted": false,
+    "challenge": {
+      "type": "quiz",
+      "question": "Cos'è Claude Code?",
+      "options": [
+        "Un servizio di hosting per siti statici",
+        "Un agente da riga di comando che legge, modifica ed esegue codice nel tuo repository",
+        "Un editor grafico per diagrammi UML"
+      ],
+      "correctIndex": 1,
+      "hint": "Vive nel terminale."
+    }
+  },
+  {
+    "id": "11",
+    "title": "Agents and Workflows",
+    "description": "Progettazione di agenti multi-step e workflow orchestrati per task complessi e a lungo termine.",
+    "codeSnippet": null,
+    "completedDate": null,
+    "isCompleted": false,
+    "challenge": {
+      "type": "code",
+      "question": "Questo loop agentico va in errore al secondo giro. Cosa manca?",
+      "code": "messages = [{\"role\": \"user\", \"content\": task}]\nwhile True:\n    response = client.messages.create(\n        model=\"claude-sonnet-5\", max_tokens=1024,\n        tools=tools, messages=messages\n    )\n    if response.stop_reason == \"tool_use\":\n        result = run_tool(response)\n        messages.append({\"role\": \"user\", \"content\": result})\n    else:\n        break",
+      "options": [
+        "Il while True non termina mai",
+        "run_tool va chiamato prima di messages.create",
+        "La risposta dell'assistente non viene aggiunta a messages prima del tool result"
+      ],
+      "correctIndex": 2,
+      "hint": "La cronologia deve alternare assistant e user: il blocco tool_use va salvato."
+    }
+  },
+  {
+    "id": "12",
+    "title": "Final Assessment and Wrap-Up",
+    "description": "Progetto finale che riunisce tutte le competenze acquisite nel corso, con revisione e prossimi passi.",
+    "codeSnippet": null,
+    "completedDate": null,
+    "isCompleted": false,
+    "challenge": {
+      "type": "quiz",
+      "question": "Quale combinazione descrive meglio un agente affidabile secondo quanto visto nel corso?",
+      "options": [
+        "Prompt chiaro + tool ben definiti + valutazione continua",
+        "Temperature al massimo + nessun system prompt",
+        "Un unico prompt gigante senza tool"
+      ],
+      "correctIndex": 0,
+      "hint": "Ripensa ai moduli 04, 05 e 06."
+    }
+  }
+]
