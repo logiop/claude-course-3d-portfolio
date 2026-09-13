@@ -8,8 +8,7 @@ Il progresso viene salvato nel `localStorage` del browser.
 
 ## Live demo
 
-<!-- LIVE_DEMO_URL -->
-_Deploy in corso — il link verrà aggiunto qui._
+**https://claude-course-3d-portfolio.vercel.app**
 
 ## Stack tecnico
 
