@@ -4,6 +4,7 @@ import { OrbitControls } from '@react-three/drei'
 import gsap from 'gsap'
 import * as THREE from 'three'
 import { useStore } from '../store/useStore'
+import { moveInput } from '../utils/touchInput'
 
 const MOVE_SPEED = 10
 
@@ -74,8 +75,13 @@ export default function CameraRig() {
     if (keys.current.d) move.add(right)
     if (keys.current.a) move.sub(right)
 
+    if (moveInput.y !== 0) move.addScaledVector(forward, moveInput.y)
+    if (moveInput.x !== 0) move.addScaledVector(right, moveInput.x)
+
     if (move.lengthSq() > 0) {
-      move.normalize().multiplyScalar(MOVE_SPEED * delta)
+      // Clamp invece di normalize: il joystick resta analogico, i tasti restano a velocità piena
+      if (move.lengthSq() > 1) move.normalize()
+      move.multiplyScalar(MOVE_SPEED * delta)
       camera.position.add(move)
       controlsRef.current.target.add(move)
     }

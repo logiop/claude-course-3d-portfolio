@@ -2,10 +2,12 @@ import { useMemo, useRef, useEffect } from 'react'
 import gsap from 'gsap'
 import { useStore } from '../store/useStore'
 import { getCircularPosition } from '../utils/layout'
+import { useIsTouchDevice } from '../utils/touchInput'
 
-const MINIMAP_SIZE = 140
+// Raggio in percentuale del lato: la minimappa si ridimensiona via CSS senza ricalcoli JS
+const MINIMAP_RADIUS_PCT = 36
 
-const CONTROLS = [
+const KEY_CONTROLS = [
   ['WASD', 'muovi'],
   ['Drag', 'ruota'],
   ['Click', 'apri isola'],
@@ -13,23 +15,17 @@ const CONTROLS = [
 ]
 
 function Minimap({ modules, activeId }) {
-  const center = MINIMAP_SIZE / 2
-  const radius = center - 14
-
   const points = useMemo(
     () =>
       modules.map((m, i) => {
-        const [x, , z] = getCircularPosition(i, modules.length, radius)
-        return { id: m.id, x: center + x, y: center + z, unlocked: m.isCompleted }
+        const [x, , z] = getCircularPosition(i, modules.length, MINIMAP_RADIUS_PCT)
+        return { id: m.id, x: 50 + x, y: 50 + z, unlocked: m.isCompleted }
       }),
-    [modules, center, radius]
+    [modules]
   )
 
   return (
-    <div
-      className="relative rounded-full border border-neon-cyan/30 bg-space-900/70 backdrop-blur-sm"
-      style={{ width: MINIMAP_SIZE, height: MINIMAP_SIZE }}
-    >
+    <div className="relative h-[104px] w-[104px] rounded-full border border-neon-cyan/30 bg-space-900/70 backdrop-blur-sm sm:h-[140px] sm:w-[140px]">
       {points.map((p) => {
         const isActive = p.id === activeId
         const dotClass = isActive
@@ -41,7 +37,7 @@ function Minimap({ modules, activeId }) {
           <span
             key={p.id}
             className={`absolute h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full transition-all duration-300 ${dotClass}`}
-            style={{ left: p.x, top: p.y }}
+            style={{ left: `${p.x}%`, top: `${p.y}%` }}
             title={p.id}
           />
         )
@@ -55,6 +51,7 @@ export default function HUD() {
   const modules = useStore((s) => s.modules)
   const hoveredId = useStore((s) => s.hoveredModuleId)
   const selectedId = useStore((s) => s.selectedModuleId)
+  const isTouch = useIsTouchDevice()
   const barRef = useRef(null)
 
   const completed = modules.filter((m) => m.isCompleted).length
@@ -75,7 +72,7 @@ export default function HUD() {
           <h1 className="text-lg tracking-wider text-neon-cyan drop-shadow-[0_0_8px_rgba(77,243,255,0.8)]">
             CLAUDE API COURSE
           </h1>
-          <div className="w-64 rounded-full border border-neon-cyan/40 bg-space-900/70 p-1 backdrop-blur-sm sm:w-72">
+          <div className="w-40 rounded-full border border-neon-cyan/40 bg-space-900/70 p-1 backdrop-blur-sm sm:w-72">
             <div
               ref={barRef}
               className="h-3 rounded-full bg-gradient-to-r from-neon-cyan to-neon-purple shadow-glow"
@@ -103,18 +100,25 @@ export default function HUD() {
       </div>
 
       <div className="flex flex-wrap items-end justify-between gap-4">
-        <ul className="flex flex-wrap gap-4 text-xs text-white/60">
-          {CONTROLS.map(([key, label]) => (
-            <li key={key} className="flex items-center gap-1.5">
-              <kbd className="rounded border border-white/20 bg-space-900/70 px-1.5 py-0.5 text-[10px] text-neon-cyan">
-                {key}
-              </kbd>
-              {label}
-            </li>
-          ))}
-        </ul>
+        {isTouch ? (
+          // Lo spazio in basso a sinistra è occupato dal joystick: i suggerimenti vanno a destra
+          <p className="ml-auto text-right text-xs text-white/50">
+            Joystick per muoverti · trascina per ruotare · tocca un&apos;isola
+          </p>
+        ) : (
+          <ul className="flex flex-wrap gap-4 text-xs text-white/60">
+            {KEY_CONTROLS.map(([key, label]) => (
+              <li key={key} className="flex items-center gap-1.5">
+                <kbd className="rounded border border-white/20 bg-space-900/70 px-1.5 py-0.5 text-[10px] text-neon-cyan">
+                  {key}
+                </kbd>
+                {label}
+              </li>
+            ))}
+          </ul>
+        )}
 
-        {hovered && !selectedId && (
+        {hovered && !selectedId && !isTouch && (
           <div className="rounded-md border border-white/10 bg-space-900/70 px-3 py-1.5 text-xs text-white/80 backdrop-blur-sm">
             <span className="text-neon-cyan">{hovered.id}</span> &middot; {hovered.title}
             <span className="ml-2 text-white/40">
